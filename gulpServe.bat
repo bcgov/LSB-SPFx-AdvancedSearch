@@ -1,0 +1,1 @@
+cls && gulp clean && gulp build && gulp bundle && gulp package-solution && gulp serve

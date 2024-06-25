@@ -1,0 +1,1 @@
+cls && gulp build && gulp bundle

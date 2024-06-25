@@ -1,0 +1,49 @@
+.divButton {
+  clear: both;
+}
+
+#dv_ParentDic {
+  width: 790px;
+}
+
+.inputBlock {
+  display: block;
+  font-size: 11px;
+  width: 180px;
+  margin: 0px 10px 2px 2px;
+  float: left;
+  z-index: 100;
+}
+
+.descStyle > input {
+  width: 91% !important;
+  padding: 6px !important;
+}
+
+.inputHeader {
+  font-weight: bold;
+}
+
+.ms-Dropdown,
+.ms-Dropdown-container {
+  font-size: 13px;
+}
+
+.ms-Dropdown ::before {
+  color: red;
+  font-weight: bold;
+  font-style: italic;
+  top: -13px;
+  right: 184px;
+}
+
+.CanvasComponent.LCS
+  .CanvasSection--read:not(.CanvasSection--fullWidth)
+  .ControlZone {
+  margin-top: 0 !important;
+}
+
+.packageVersion {
+  font-size: 8px;
+  display: inline-flex;
+}

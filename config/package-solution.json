@@ -1,0 +1,40 @@
+{
+    "$schema": "https://developer.microsoft.com/json-schemas/spfx-build/package-solution.schema.json",
+    "solution": {
+        "name": "SearchDoc Web Part",
+        "id": "a5f3b1e8-7e52-4e59-9a12-8392a3d3b8e3",
+        "version": "1.4.26.0",
+        "includeClientSideAssets": true,
+        "skipFeatureDeployment": true,
+        "isDomainIsolated": false,
+        "developer": {
+            "name": "NTT DATA - Sierra Systems Group Inc.",
+            "websiteUrl": "https://ca.nttdata.com/en",
+            "privacyUrl": "https://ca.nttdata.com/en/privacy-policy",
+            "termsOfUseUrl": "https://ca.nttdata.com/en/term",
+            "mpnId": "65312"
+        },
+        "metadata": {
+            "shortDescription": {
+                "default": "Advanced document library search web part"
+            },
+            "longDescription": {
+                "default": "This web part will search for approved documents in a series of document libraries in the current site based on metadata filters."
+            },
+            "screenshotPaths": [],
+            "videoUrl": "",
+            "categories": []
+        },
+        "features": [
+            {
+                "title": "Advanced Search Web Part Feature",
+                "description": "The feature that activates elements of the SearchDoc solution.",
+                "id": "7e3a94c3-5a4f-44cb-9baf-1505721e6327",
+                "version": "1.4.0.0"
+            }
+        ]
+    },
+    "paths": {
+        "zippedPackage": "solution/SearchDoc-1.4.sppkg"
+    }
+}

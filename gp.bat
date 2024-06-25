@@ -1,0 +1,1 @@
+cls && gulp clean && gulp build -p && gulp bundle -p && gulp package-solution -p
