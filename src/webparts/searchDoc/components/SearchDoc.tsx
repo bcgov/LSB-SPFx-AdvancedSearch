@@ -9,7 +9,6 @@
 /* eslint-disable no-var */
 import * as React from 'react';
 import styles from './SearchDoc.module.scss';
-
 import { ISearchDocProps } from './ISearchDocProps';
 import { ISearchDocState } from './ISearchDocState';
 import { SPOperation } from "../../Services/SPOps";
@@ -17,11 +16,8 @@ import { ComboBox, PrimaryButton } from "office-ui-fabric-react";
 import { sp } from '@pnp/sp';
 import { Pagination } from "@pnp/spfx-controls-react/lib/pagination";
 
- 
 
-export default class SearchDoc extends React.Component<ISearchDocProps, ISearchDocState,
-  {}>
-{
+export default class SearchDoc extends React.Component<ISearchDocProps, ISearchDocState, {}> {
   private _spService: SPOperation;
   public selectedListTitleArea1: string;
   public selectedListTitleTopic1: string;
@@ -34,13 +30,14 @@ export default class SearchDoc extends React.Component<ISearchDocProps, ISearchD
   public selectedConflict: string;
   public selectedLibrary: string = 'All';
   public selectedSort: string = 'File Name';
+  public selectedLevelOfCourt: string;
   public keyPhraseValue: string;
   public queries: string[] = [];
   public defaultOption: string = '';
   public libraries: string[] = [];
   public libsToQuery: string[] = [];
   public itemList: any = [];
-  public viewfields: string = '<ViewFields><FieldRef Name="Name"/><FieldRef Name="LSB_AreaOfLaw"/><FieldRef Name="LSB_AreaOfLaw2"/><FieldRef Name="LSB_TopicsOfLaw"/><FieldRef Name="LSB_TopicsOfLaw2"/><FieldRef Name="LSB_Legislation"/><FieldRef Name="LSB_Conflict"/><FieldRef Name="Document_x0020_Type"/><FieldRef Name="LSB_AuthorNames"/><FieldRef Name="Year"/><FieldRef Name="LSB_LegalFileNumber"/><FieldRef Name="RoutingRuleDescription"/></ViewFields>';
+  public viewfields: string = '<ViewFields><FieldRef Name="Name"/><FieldRef Name="LSB_AreaOfLaw"/><FieldRef Name="LSB_AreaOfLaw2"/><FieldRef Name="LSB_TopicsOfLaw"/><FieldRef Name="LSB_TopicsOfLaw2"/><FieldRef Name="LSB_Legislation"/><FieldRef Name="LSB_Conflict"/><FieldRef Name="Document_x0020_Type"/><FieldRef Name="LSB_AuthorNames"/><FieldRef Name="Year"/><FieldRef Name="LSB_LegalFileNumber"/><FieldRef Name="RoutingRuleDescription"/><FieldRef Name="LevelOfCourt"/></ViewFields>';
   public finalQuery: string = '';
   public areaLookup: Map<number, string> = new Map<number, string>();
   public areaIdLookup: Map<string, number> = new Map<string, number>();
@@ -51,6 +48,7 @@ export default class SearchDoc extends React.Component<ISearchDocProps, ISearchD
   public docTypeLookup: Map<number, string> = new Map<number, string>();
   public authorLookup: Map<number, string> = new Map<number, string>();
   public yearLookup: Map<number, string> = new Map<number, string>();
+  public levelOfCourtLookup: Map<number, string> = new Map<number, string>();
   public lookupLibs: Map<number, string> = new Map<number, string>();
   public lookupLibByUrlFragment: Map<string, string> = new Map<string, string>();
   public lookupUrlFragmentByLibName: Map<string, string> = new Map<string, string>();
@@ -88,7 +86,17 @@ export default class SearchDoc extends React.Component<ISearchDocProps, ISearchD
   private _initFormState() {
     this._spService = new SPOperation();
     this.state = {
-      listTitlesArea1: [], listAreaTopics1: [], listTitlesArea2: [], listAreaTopics2: [], listTitlesLegislation: [], listTitlesDocType: [], listTitlesAuthor: [], listTitlesYear: [], listTitlesLibrary: [], keyPhrase: '',
+      listTitlesArea1: [], 
+      listAreaTopics1: [], 
+      listTitlesArea2: [], 
+      listAreaTopics2: [], 
+      listTitlesLegislation: [], 
+      listTitlesDocType: [], 
+      listTitlesAuthor: [], 
+      listTitlesYear: [], 
+      listTitlesLibrary: [], 
+      listTitlesLevelOfCourt: [], 
+      keyPhrase: '',
       items: [
         {
           LSB_AreaOfLaw1: "",
@@ -105,7 +113,8 @@ export default class SearchDoc extends React.Component<ISearchDocProps, ISearchD
           Name: "",
           RoutingRuleDescription: "",
           URL: "",
-          LSB_LibURL: ""
+          LSB_LibURL: "",
+          LevelOfCourt: ""
         }
       ],
       searchEnabled: true,
@@ -114,6 +123,7 @@ export default class SearchDoc extends React.Component<ISearchDocProps, ISearchD
       secondTopicEnabled: false,
       selectedSort: this.selectedSort,
       selectedLibrary: this.selectedLibrary,
+      selectedLevelOfCourt: '',
       paginatedItems: [
         {
           LSB_AreaOfLaw1: "",
@@ -130,12 +140,12 @@ export default class SearchDoc extends React.Component<ISearchDocProps, ISearchD
           Name: "",
           RoutingRuleDescription: "",
           URL: "",
-          LSB_LibURL: ""
+          LSB_LibURL: "",
+          LevelOfCourt: ""
         }
       ],
     };
   }
-
 
   // Method to find a value in a string or string array
   public containsVal(inputObj: any, searchValue: string): boolean {
@@ -150,7 +160,7 @@ export default class SearchDoc extends React.Component<ISearchDocProps, ISearchD
   }
 
   public componentDidMount(): void {
-    //Setup functions to load the dropdowns
+    // Setup functions to load the dropdowns
     document.getElementById('dv_Table').style.display = 'none';
     document.getElementById('dv_pagination').style.display = 'none';
     this._spService.getAllTopics(this.topicLookup, this.topicIdLookup).then((result) => {
@@ -162,7 +172,6 @@ export default class SearchDoc extends React.Component<ISearchDocProps, ISearchD
       this.setState({ listTitlesArea2: result });
     });
     this._spService.GetDropdownOptions(this.legislationLookup, "Legislation").then((result) => {
-      //console.log("Legislation options loaded:", result);
       this.setState({ listTitlesLegislation: result });
     });
     this._spService.GetDropdownOptions(this.docTypeLookup, "Document Types").then((result) => {
@@ -174,10 +183,14 @@ export default class SearchDoc extends React.Component<ISearchDocProps, ISearchD
     this._spService.GetDropdownOptions(this.yearLookup, "Years").then((result) => {
       this.setState({ listTitlesYear: result });
     });
+    this._spService.GetDropdownOptions(this.levelOfCourtLookup, "LevelOfCourt").then((result) => {
+      this.setState({ listTitlesLevelOfCourt: result });
+    });
+
     this._spService.GetLibDropdownOptions(this.lookupLibs, this.topicIdLookup, this.lookupLibByUrlFragment, this.lookupUrlFragmentByLibName, this.libsList, this.selectedLibrary).then((result) => {
       this.setState({ listTitlesLibrary: result });
     });
-
+  
     let drLib = document.getElementById('drLib-input');
     if (drLib !== undefined && drLib !== null) {
       drLib.setAttribute('value', 'All');
@@ -193,7 +206,7 @@ export default class SearchDoc extends React.Component<ISearchDocProps, ISearchD
     this.setState({ selectedSort: this.selectedSort })
   }
 
-  //Functions to get the selected value and implement the cascading dropdown functionality
+  // Functions to get the selected value and implement the cascading dropdown functionality
   public getSelectedListTitleArea1 = (ev: any, data: any) => {
     this.selectedListTitleArea1 = data.text;
     this._spService.getArea1Topics(this.topicLookup, this.topicIdLookup, data.text).then((resultTopic: any) => {
@@ -201,10 +214,12 @@ export default class SearchDoc extends React.Component<ISearchDocProps, ISearchD
     });
     this.setState({ searchEnabled: true, firstTopicEnabled: true });
   }
+
   public getselectedListTitleTopic1 = (ev: any, data: any) => {
     this.selectedListTitleTopic1 = data.text;
     this.setState({ searchEnabled: true, secondAreaEnabled: true });
   }
+
   public getSelectedListTitleArea2 = (ev: any, data: any) => {
     this.selectedListTitleArea2 = data.text;
     this._spService.getArea2Topics(this.topicLookup, this.topicIdLookup, data.text).then((resultTopic: any) => {
@@ -212,6 +227,7 @@ export default class SearchDoc extends React.Component<ISearchDocProps, ISearchD
     });
     this.setState({ searchEnabled: true, secondTopicEnabled: true });
   }
+
   public getselectedListTitleTopic2 = (ev: any, data: any) => {
     this.selectedListTitleTopic2 = data.text;
   }
@@ -220,30 +236,42 @@ export default class SearchDoc extends React.Component<ISearchDocProps, ISearchD
     this.selectedListTitleLegislation = data.text;
     this.setState({ searchEnabled: true });
   }
+
   public getSelectedListTitleAuthor = (ev: any, data: any) => {
     this.selectedListTitleAuthor = data.text;
     this.setState({ searchEnabled: true });
   }
+
   public getSelectedListTitleDocType = (ev: any, data: any) => {
     this.selectedListTitleDocType = data.text;
     this.setState({ searchEnabled: true });
   }
+
   public getSelectedListTitleYear = (ev: any, data: any) => {
     this.selectedListTitleYear = data.text;
     this.setState({ searchEnabled: true });
   }
+
   public getSelectedConflict = (ev: any, data: any) => {
     this.selectedConflict = data.text;
     this.setState({ searchEnabled: true });
   }
+
   public getSelectedLibrary = (ev: any, data: any) => {
     this.selectedLibrary = data.text;
     this.setState({ selectedLibrary: this.selectedLibrary });
   }
+
   public getSelectedSort = (ev: any, data: any) => {
     this.selectedSort = data.text;
     this.setState({ selectedSort: this.selectedSort })
   }
+
+  public getSelectedLevelOfCourt = (ev: any, data: any) => {
+    this.selectedLevelOfCourt = data.text;
+    this.setState({ selectedLevelOfCourt: this.selectedLevelOfCourt });
+  }
+
   public getkeyPhraseValue = (ev: any, data: any) => {
     this.keyPhraseValue = data.text;
     this.setState({ searchEnabled: true });
@@ -254,6 +282,7 @@ export default class SearchDoc extends React.Component<ISearchDocProps, ISearchD
     var query = '<View><Query><Where>' + con + '</Where></Query>' + this.viewfields + '</View>';
     return query;
   }
+
   public getQueryTwoFilters = (queries: string[]): string => {
     var cond1 = queries[0];
     var cond2 = queries[1];
@@ -268,6 +297,7 @@ export default class SearchDoc extends React.Component<ISearchDocProps, ISearchD
     var query = '<View><Query><Where><And>' + cond1 + '<And>' + cond2 + cond3 + '</And></And></Where></Query>' + this.viewfields + '</View>';
     return query;
   }
+
   public getQueryFourFilters = (queries: string[]): string => {
     var cond1 = queries[0];
     var cond2 = queries[1];
@@ -276,6 +306,7 @@ export default class SearchDoc extends React.Component<ISearchDocProps, ISearchD
     var query = '<View><Query><Where><And>' + cond1 + '<And>' + cond2 + '<And>' + cond3 + cond4 + '</And></And></And></Where></Query>' + this.viewfields + '</View>';
     return query;
   }
+
   public getQueryFiveFilters = (queries: string[]): string => {
     var cond1 = queries[0];
     var cond2 = queries[1];
@@ -285,6 +316,7 @@ export default class SearchDoc extends React.Component<ISearchDocProps, ISearchD
     var query = '<View><Query><Where><And>' + cond1 + '<And>' + cond2 + '<And>' + cond3 + '<And>' + cond4 + cond5 + '</And></And></And></And></Where></Query>' + this.viewfields + '</View>';
     return query;
   }
+
   public getQuerySixFilters = (queries: string[]): string => {
     var cond1 = queries[0];
     var cond2 = queries[1];
@@ -295,6 +327,7 @@ export default class SearchDoc extends React.Component<ISearchDocProps, ISearchD
     var query = '<View><Query><Where><And>' + cond1 + '<And>' + cond2 + '<And>' + cond3 + '<And>' + cond4 + '<And>' + cond5 + cond6 + '</And></And></And></And></And></Where></Query>' + this.viewfields + '</View>';
     return query;
   }
+
   public getQuerySevenFilters = (queries: string[]): string => {
     var cond1 = queries[0];
     var cond2 = queries[1];
@@ -306,6 +339,7 @@ export default class SearchDoc extends React.Component<ISearchDocProps, ISearchD
     var query = '<View><Query><Where><And>' + cond1 + '<And>' + cond2 + '<And>' + cond3 + '<And>' + cond4 + '<And>' + cond5 + '<And>' + cond6 + cond7 + '</And></And></And></And></And></And></Where></Query>' + this.viewfields + '</View>';
     return query;
   }
+
   public getQueryEightFilters = (queries: string[]): string => {
     var cond1 = queries[0];
     var cond2 = queries[1];
@@ -318,6 +352,7 @@ export default class SearchDoc extends React.Component<ISearchDocProps, ISearchD
     var query = '<View><Query><Where><And>' + cond1 + '<And>' + cond2 + '<And>' + cond3 + '<And>' + cond4 + '<And>' + cond5 + '<And>' + cond6 + '<And>' + cond7 + cond8 + '</And></And></And></And></And></And></And></Where></Query>' + this.viewfields + '</View>';
     return query;
   }
+
   public getQueryNineFilters = (queries: string[]): string => {
     var cond1 = queries[0];
     var cond2 = queries[1];
@@ -612,19 +647,18 @@ export default class SearchDoc extends React.Component<ISearchDocProps, ISearchD
       cond = '';
     }
 
-
     if (this.selectedListTitleLegislation !== undefined) {
-  const cond = `
-  <Contains>
-      <FieldRef Name="LSB_Legislation"/>
-      <Value Type="Lookup">${this.selectedListTitleLegislation}</Value>
+      const cond = `
+      <Contains>
+          <FieldRef Name="LSB_Legislation"/>
+          <Value Type="Lookup">${this.selectedListTitleLegislation}</Value>
       </Contains>
-  `;
+      `;
       queries.push(cond);
       n++;
       filterCount++;
-     // console.log("Legislation query:", cond); // Added console.log
     }
+
     if (this.selectedListTitleDocType !== undefined) {
       cond = `
               <Eq>
@@ -636,6 +670,7 @@ export default class SearchDoc extends React.Component<ISearchDocProps, ISearchD
       n++;
       filterCount++;
     }
+
     if (this.selectedListTitleAuthor !== undefined) {
       cond = `
               <Contains>
@@ -647,6 +682,7 @@ export default class SearchDoc extends React.Component<ISearchDocProps, ISearchD
       n++;
       filterCount++;
     }
+
     if (this.selectedListTitleYear !== undefined) {
       cond = `
               <Eq>
@@ -658,6 +694,7 @@ export default class SearchDoc extends React.Component<ISearchDocProps, ISearchD
       n++;
       filterCount++;
     }
+
     if (this.selectedConflict !== undefined) {
       cond = `
               <Eq>
@@ -665,6 +702,18 @@ export default class SearchDoc extends React.Component<ISearchDocProps, ISearchD
                 <Value Type="Text">${this.selectedConflict}</Value>
               </Eq>
               `;
+      queries.push(cond);
+      n++;
+      filterCount++;
+    }
+
+    if (this.selectedLevelOfCourt !== undefined) {
+      const cond = `
+        <Eq>
+          <FieldRef Name="LevelOfCourt"/>
+          <Value Type="Choice">${this.selectedLevelOfCourt}</Value>
+        </Eq>
+      `;
       queries.push(cond);
       n++;
       filterCount++;
@@ -697,8 +746,6 @@ export default class SearchDoc extends React.Component<ISearchDocProps, ISearchD
 
     document.getElementById('dv_Table').style.display = 'none';
 
-   // console.log("CAML Query: " + finalQuery);
-
     this.itemList = [];
     this.libsToQuery = [];
 
@@ -715,17 +762,13 @@ export default class SearchDoc extends React.Component<ISearchDocProps, ISearchD
     }
 
     for (var i = 0; i < this.libsToQuery.length; i++) {
-
       let lib = this.libsToQuery[i];
-     // console.log("Doc library: " + lib);
 
       // Get the documents by passing the dynamic query using pnp.js
       sp.web.lists.getByTitle(lib).getItemsByCAMLQuery({
         ViewXml: finalQuery
       }, "File").then((results: any) => {
-       // console.log("Results for library", lib, ":", results); // Added console.log
         results.map((result: any) => {
-
           let keep: boolean = true;
 
           let fil = result.File;
@@ -733,7 +776,6 @@ export default class SearchDoc extends React.Component<ISearchDocProps, ISearchD
           if (!are) are = '';
           let topFound: boolean = false;
           let top = this._joinLookupArrayValues(result.LSB_TopicsOfLawId, topicLookup, '; ');
-        //  console.log("Topics values:", top); // Debugging output
           if (!top) top = this._joinLookupArrayValues(result.LSB_TopicsOfLaw2Id, topicLookup, '; ')
           if (!top) top = '';
           if (selTopic1) topFound = this.containsVal(top, this.selectedListTitleTopic1);
@@ -749,11 +791,8 @@ export default class SearchDoc extends React.Component<ISearchDocProps, ISearchD
           else if (are !== undefined) keep = true;
 
           if (keep) {
-            //let leg = legislationLookup.get(result.LSB_LegislationId);
-            let leg = this._joinLookupArrayValues(result.LSB_LegislationId, legislationLookup, '; '); // Updated line
-           // console.log("Legislation ID:", result.LSB_LegislationId, "Legislation Value:", leg); // Added console.log
+            let leg = this._joinLookupArrayValues(result.LSB_LegislationId, legislationLookup, '; ');
             if (!leg) leg = '';
-           // console.log("Legislation values:", leg); // Debugging output
             let aut = this._joinLookupArrayValues(result.LSB_AuthorNamesId, this.authorLookup, '; ');
             if (!aut) aut = '';
             let cfl = result.LSB_Conflict;
@@ -763,6 +802,8 @@ export default class SearchDoc extends React.Component<ISearchDocProps, ISearchD
             let num = result.LSB_LegalFileNumber;
             let dsc = result.RoutingRuleDescription;
             if (!dsc) dsc = '';
+            let loc = result.LevelOfCourt;
+            if (!loc) loc = '';
             try {
               let url = fil.LinkingUri;
               if (url === null) url = fil.ServerRelativeUrl;
@@ -792,11 +833,11 @@ export default class SearchDoc extends React.Component<ISearchDocProps, ISearchD
                   LSB_LibURL: lbu,
                   URL: url,
                   Year: yea,
+                  LevelOfCourt: loc
                 }
                 this.itemList.push(indItem);
 
                 this.finalCount++;
-               // console.log("Processed Item:", indItem); // Debugging output
                 this.pagesTotal = Math.ceil(this.finalCount / this.pageSize);
                 if (this.pagesTotal >= this.pagesMax) this.pagesTotal = this.pagesMax;
               }
@@ -895,7 +936,7 @@ export default class SearchDoc extends React.Component<ISearchDocProps, ISearchD
           default:
         }
 
-        //Results are bound to the state
+        // Results are bound to the state
         this.setState({ items: this.itemList });
         this._getPage(1);
         document.getElementById('dv_SearchResults').style.display = 'table-cell';
@@ -911,7 +952,6 @@ export default class SearchDoc extends React.Component<ISearchDocProps, ISearchD
   }
 
   private _joinLookupArrayValues(theArray: number[], theLookup: Map<number, string>, joiner: string) {
-
     let joined: string = '';
     let i = 0;
     if (theArray) {
@@ -921,10 +961,8 @@ export default class SearchDoc extends React.Component<ISearchDocProps, ISearchD
         i++;
       }
     }
-
     return joined;
   }
-
 
   /***********************************************************************************************************************************/
 
@@ -975,6 +1013,10 @@ export default class SearchDoc extends React.Component<ISearchDocProps, ISearchD
             <ComboBox id="drConflict" options={this.conflict} autoComplete='on' placeholder={'Select Yes or No'} onChange={this.getSelectedConflict} />
           </div>
           <div className={styles.inputBlock}>
+            <div className={styles.inputHeader}> Level of Court: </div>
+            <ComboBox id="drLevelOfCourt" options={this.state.listTitlesLevelOfCourt} autoComplete='on' placeholder={'Select Level of Court'} onChange={this.getSelectedLevelOfCourt} />
+          </div>
+          <div className={styles.inputBlock}>
             <div className={styles.inputHeader}> Library Selection: </div>
             <ComboBox id="drLib" options={this.state.listTitlesLibrary} selectedKey={0} placeholder={'Select Library'} onChange={this.getSelectedLibrary} />
           </div>
@@ -1015,6 +1057,7 @@ export default class SearchDoc extends React.Component<ISearchDocProps, ISearchD
                       <div className={styles.DocPropStyle}><strong>Topics (2):</strong> {item.LSB_TopicsOfLaw2}</div>
                       <div className={styles.DocPropStyle}><strong>Legislation:</strong> {item.LSB_Legislation}</div>
                       <div className={styles.DocPropStyle}><strong>Restrictions:</strong> {item.LSB_Conflict}</div>
+                      <div className={styles.DocPropStyle}><strong>Level of Court:</strong> {item.LevelOfCourt}</div>
                       <div className={styles.DocPropStyle}><strong>Year:</strong> {item.Year}</div>
                       <div className={styles.DocPropStyle}><strong>Doc Type:</strong> {item.Document_x0020_Type}</div>
                       <div className={styles.DocPropStyle}><strong>Author(s):</strong> {item.LSB_AuthorNames}</div>

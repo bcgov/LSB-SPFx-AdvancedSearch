@@ -12,6 +12,7 @@ export interface ISearchDocState {
   listTitlesAuthor: IDropdownOption[], 
   listTitlesYear: IDropdownOption[],
   listTitlesLibrary: IDropdownOption[],
+  listTitlesLevelOfCourt: IDropdownOption[],
   keyPhrase: string,
   searchEnabled: boolean,
   firstTopicEnabled: boolean,
@@ -19,8 +20,8 @@ export interface ISearchDocState {
   secondTopicEnabled: boolean,
   selectedSort: string,
   selectedLibrary: string,
-  items:
-  {
+  selectedLevelOfCourt: string,
+  items: {
     LSB_AreaOfLaw1?: string,
     LSB_AreaOfLaw2?: string,
     LSB_AuthorNames?: string,
@@ -36,9 +37,9 @@ export interface ISearchDocState {
     Name?: string,
     RoutingRuleDescription?: string,
     URL?: string,
+    LevelOfCourt?: string,
   }[],
-  paginatedItems:
-  {
+  paginatedItems: {
     LSB_AreaOfLaw1?: string,
     LSB_AreaOfLaw2?: string,
     LSB_AuthorNames?: string,
@@ -54,5 +55,7 @@ export interface ISearchDocState {
     Name?: string,
     RoutingRuleDescription?: string,
     URL?: string,
+    LevelOfCourt?: string,
   }[]
 }
+
