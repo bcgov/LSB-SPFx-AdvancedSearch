@@ -3,7 +3,7 @@
     "solution": {
         "name": "SearchDoc Web Part",
         "id": "a5f3b1e8-7e52-4e59-9a12-8392a3d3b8e3",
-        "version": "1.4.26.0",
+        "version": "1.5.0.0",
         "includeClientSideAssets": true,
         "skipFeatureDeployment": true,
         "isDomainIsolated": false,
@@ -30,7 +30,7 @@
                 "title": "Advanced Search Web Part Feature",
                 "description": "The feature that activates elements of the SearchDoc solution.",
                 "id": "7e3a94c3-5a4f-44cb-9baf-1505721e6327",
-                "version": "1.4.0.0"
+                "version": "1.5.0.0"
             }
         ]
     },
