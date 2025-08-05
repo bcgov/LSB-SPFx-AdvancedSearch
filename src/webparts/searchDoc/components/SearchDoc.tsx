@@ -191,6 +191,7 @@ export default class SearchDoc extends React.Component<
     this._spService
       .GetDropdownOptions(this.legislationLookup, "Legislation")
       .then((result) => {
+        result.sort((a, b) => a.text.localeCompare(b.text));
         this.setState({ listTitlesLegislation: result });
       });
     this._spService
@@ -201,7 +202,8 @@ export default class SearchDoc extends React.Component<
     this._spService
       .GetDropdownOptions(this.authorLookup, "Authors")
       .then((result) => {
-        this.setState({ listTitlesAuthor: result });
+        result.sort((a, b) => a.text.localeCompare(b.text));
+        this.setState({ listTitlesAuthor: result }); 
       });
     this._spService
       .GetDropdownOptions(this.yearLookup, "Years")
