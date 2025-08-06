@@ -1,4 +1,4 @@
-/* eslint-disable @rushstack/security/no-unsafe-regexp */
+/* eslint-disable @rushstack/security/no-unsafe-regexp */ 
 /* eslint-disable react/no-direct-mutation-state */
 /* eslint-disable react/jsx-no-target-blank */
 /* eslint-disable prefer-const */
@@ -181,10 +181,12 @@ export default class SearchDoc extends React.Component<
     this._spService
       .getAllTopics(this.topicLookup, this.topicIdLookup)
       .then((result) => {
+        result.sort((a, b) => a.text.localeCompare(b.text));
         this.setState({ listAreaTopics1: result });
         this.setState({ listAreaTopics2: result });
       });
     this._spService.getAreaDropDownOptions(this.areaLookup).then((result) => {
+      result.sort((a, b) => a.text.localeCompare(b.text));
       this.setState({ listTitlesArea1: result });
       this.setState({ listTitlesArea2: result });
     });
@@ -197,6 +199,7 @@ export default class SearchDoc extends React.Component<
     this._spService
       .GetDropdownOptions(this.docTypeLookup, "Document Types")
       .then((result) => {
+        result.sort((a, b) => a.text.localeCompare(b.text));
         this.setState({ listTitlesDocType: result });
       });
     this._spService
@@ -208,11 +211,13 @@ export default class SearchDoc extends React.Component<
     this._spService
       .GetDropdownOptions(this.yearLookup, "Years")
       .then((result) => {
+        result.sort((a, b) => b.text.localeCompare(a.text));
         this.setState({ listTitlesYear: result });
       });
     this._spService
       .GetDropdownOptions(this.levelOfCourtLookup, "LevelOfCourt")
       .then((result) => {
+        result.sort((a, b) => a.text.localeCompare(b.text));
         this.setState({ listTitlesLevelOfCourt: result });
       });
 
@@ -226,6 +231,7 @@ export default class SearchDoc extends React.Component<
         this.selectedLibrary
       )
       .then((result) => {
+        //result.sort((a, b) => a.text.localeCompare(b.text));
         this.setState({ listTitlesLibrary: result });
       });
 
@@ -1407,7 +1413,7 @@ export default class SearchDoc extends React.Component<
                             // if the library is Labour and Employment, render as red
                             <span className="LandEHighlight">
                               <TooltipHost
-                                content="Warning: This document is from the Labour and Employment Library. Please use with caution."
+                                content="Warning: This document is from the Labour and Employment Library. Please do not distribute to unionized employees."
                                 calloutProps={{ gapSpace: 0 }}
                               >
                                 <a
