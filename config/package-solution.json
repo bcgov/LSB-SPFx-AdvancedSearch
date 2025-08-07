@@ -3,7 +3,7 @@
     "solution": {
         "name": "SearchDoc Web Part",
         "id": "a5f3b1e8-7e52-4e59-9a12-8392a3d3b8e3",
-        "version": "1.6.0.0",
+        "version": "1.6.2.0",
         "includeClientSideAssets": true,
         "skipFeatureDeployment": true,
         "isDomainIsolated": false,
